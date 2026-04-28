@@ -1,6 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import MedicoHeader from './print/components/MedicoHeader.jsx';
+import PrintActionButton from './print/components/PrintActionButton.jsx';
+import PrintLayout from './print/components/PrintLayout.jsx';
+import SignatureFooter from './print/components/SignatureFooter.jsx';
+import { useAutoPrint } from './print/hooks/useAutoPrint.js';
+import {
+  getPatient,
+  getPatientConsultations,
+  getPatientMedications,
+  getPatientProcedures,
+  getSettings,
+} from './print/services/printService.js';
+
+function Block({ title, children }) {
+  return (
+    <section className="mb-4">
+      <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">{title}</h3>
+      <p className="text-sm whitespace-pre-wrap">{children}</p>
+    </section>
+  );
+}
 
 export default function PrintInforme() {
   const { patientId } = useParams();
@@ -8,40 +28,26 @@ export default function PrintInforme() {
 
   useEffect(() => {
     (async () => {
-      const [p, c, proc, meds, s] = await Promise.all([
-        api.get(`/patients/${patientId}`),
-        api.get(`/consultations/patient/${patientId}`),
-        api.get(`/procedures/patient/${patientId}`),
-        api.get(`/medications/patient/${patientId}`),
-        api.get('/admin/settings'),
+      const [paciente, consultas, procedimientos, medicamentos, settings] = await Promise.all([
+        getPatient(patientId),
+        getPatientConsultations(patientId),
+        getPatientProcedures(patientId),
+        getPatientMedications(patientId),
+        getSettings(),
       ]);
-      setData({
-        paciente: p.patient,
-        consultas: c.consultations,
-        procedimientos: proc.procedures,
-        medicamentos: meds.medications,
-        settings: s.settings,
-      });
-      setTimeout(() => window.print(), 500);
+      setData({ paciente, consultas, procedimientos, medicamentos, settings });
     })();
   }, [patientId]);
+
+  useAutoPrint(Boolean(data), 500);
 
   if (!data) return <div className="p-8">Cargando...</div>;
   const { paciente, consultas, procedimientos, medicamentos, settings } = data;
   const medsActivas = medicamentos.filter(m => m.activo);
 
   return (
-    <div className="min-h-screen bg-white p-12 text-slate-900 max-w-3xl mx-auto print:p-0">
-      <header className="border-b-2 border-slate-900 pb-4 mb-6">
-        <h1 className="text-2xl font-bold">{settings.medico_nombre || 'Dr./Dra. ___'}</h1>
-        <p className="text-sm text-slate-600">{settings.medico_especialidad || 'Anestesiología / Algología'}</p>
-        {settings.medico_exequatur && <p className="text-sm text-slate-600">Exequátur: {settings.medico_exequatur}</p>}
-        {(settings.direccion || settings.telefono) && (
-          <p className="text-sm text-slate-600 mt-1">
-            {settings.direccion}{settings.telefono && ` · Tel: ${settings.telefono}`}
-          </p>
-        )}
-      </header>
+    <PrintLayout>
+      <MedicoHeader settings={settings} />
 
       <h2 className="text-xl font-bold mb-4">Informe clínico</h2>
       <div className="grid grid-cols-2 gap-2 text-sm mb-6">
@@ -51,12 +57,8 @@ export default function PrintInforme() {
         <div><strong>Fecha informe:</strong> {new Date().toLocaleDateString('es-DO')}</div>
       </div>
 
-      {paciente.antecedentes_personales && (
-        <Block title="Antecedentes personales">{paciente.antecedentes_personales}</Block>
-      )}
-      {paciente.antecedentes_alergicos && (
-        <Block title="Alergias">{paciente.antecedentes_alergicos}</Block>
-      )}
+      {paciente.antecedentes_personales && <Block title="Antecedentes personales">{paciente.antecedentes_personales}</Block>}
+      {paciente.antecedentes_alergicos && <Block title="Alergias">{paciente.antecedentes_alergicos}</Block>}
 
       {consultas.length > 0 && (
         <section className="mb-6">
@@ -106,27 +108,8 @@ export default function PrintInforme() {
         </section>
       )}
 
-      <footer className="mt-20 pt-8">
-        <div className="border-t-2 border-slate-900 pt-2 w-64 ml-auto text-center">
-          <p className="text-sm">Firma y sello</p>
-          <p className="text-xs text-slate-600 mt-1">{settings.medico_nombre || ''}</p>
-        </div>
-      </footer>
-
-      <div className="mt-8 text-center no-print">
-        <button onClick={() => window.print()} className="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm">
-          Imprimir / Guardar PDF
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Block({ title, children }) {
-  return (
-    <section className="mb-4">
-      <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">{title}</h3>
-      <p className="text-sm whitespace-pre-wrap">{children}</p>
-    </section>
+      <SignatureFooter settings={settings} />
+      <PrintActionButton />
+    </PrintLayout>
   );
 }

@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import MedicoHeader from './print/components/MedicoHeader.jsx';
+import PrintActionButton from './print/components/PrintActionButton.jsx';
+import PrintLayout from './print/components/PrintLayout.jsx';
+import SignatureFooter from './print/components/SignatureFooter.jsx';
+import { useAutoPrint } from './print/hooks/useAutoPrint.js';
+import { getConsultation, getPatient, getSettings } from './print/services/printService.js';
+import { calcularEdad } from './print/utils/age.js';
 
 export default function PrintReceta() {
   const { consultationId } = useParams();
@@ -8,37 +14,27 @@ export default function PrintReceta() {
 
   useEffect(() => {
     (async () => {
-      const c = await api.get(`/consultations/${consultationId}`);
-      const [s, pat] = await Promise.all([
-        api.get('/admin/settings'),
-        api.get(`/patients/${c.consultation.patient_id}`),
-      ]);
-      setData({ consulta: c.consultation, settings: s.settings, paciente: pat.patient });
-      setTimeout(() => window.print(), 400);
+      const consulta = await getConsultation(consultationId);
+      const [settings, paciente] = await Promise.all([getSettings(), getPatient(consulta.patient_id)]);
+      setData({ consulta, settings, paciente });
     })();
   }, [consultationId]);
 
+  useAutoPrint(Boolean(data));
+
   if (!data) return <div className="p-8">Cargando...</div>;
   const { consulta, settings, paciente } = data;
+  const edad = calcularEdad(paciente.fecha_nacimiento);
 
   return (
-    <div className="min-h-screen bg-white p-12 text-slate-900 max-w-3xl mx-auto print:p-0">
-      <header className="border-b-2 border-slate-900 pb-4 mb-6">
-        <h1 className="text-2xl font-bold">{settings.medico_nombre || 'Dr./Dra. ___'}</h1>
-        <p className="text-sm text-slate-600">{settings.medico_especialidad || 'Anestesiología / Algología'}</p>
-        {settings.medico_exequatur && <p className="text-sm text-slate-600">Exequátur: {settings.medico_exequatur}</p>}
-        {(settings.direccion || settings.telefono) && (
-          <p className="text-sm text-slate-600 mt-2">
-            {settings.direccion}{settings.telefono && ` · Tel: ${settings.telefono}`}
-          </p>
-        )}
-      </header>
+    <PrintLayout>
+      <MedicoHeader settings={settings} />
 
       <section className="mb-6">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div><strong>Paciente:</strong> {paciente.nombre} {paciente.apellido}</div>
           <div><strong>Cédula:</strong> {paciente.cedula || '—'}</div>
-          <div><strong>Edad:</strong> {paciente.fecha_nacimiento ? calcularEdad(paciente.fecha_nacimiento) + ' años' : '—'}</div>
+          <div><strong>Edad:</strong> {edad != null ? `${edad} años` : '—'}</div>
           <div><strong>Fecha:</strong> {new Date(consulta.date).toLocaleDateString('es-DO')}</div>
         </div>
       </section>
@@ -57,27 +53,8 @@ export default function PrintReceta() {
         </section>
       )}
 
-      <footer className="mt-20 pt-8">
-        <div className="border-t-2 border-slate-900 pt-2 w-64 ml-auto text-center">
-          <p className="text-sm">Firma y sello</p>
-          <p className="text-xs text-slate-600 mt-1">{settings.medico_nombre || ''}</p>
-        </div>
-      </footer>
-
-      <div className="mt-8 text-center no-print">
-        <button onClick={() => window.print()} className="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm">
-          Imprimir / Guardar PDF
-        </button>
-      </div>
-    </div>
+      <SignatureFooter settings={settings} />
+      <PrintActionButton />
+    </PrintLayout>
   );
-}
-
-function calcularEdad(fechaNac) {
-  const hoy = new Date();
-  const nac = new Date(fechaNac);
-  let edad = hoy.getFullYear() - nac.getFullYear();
-  const m = hoy.getMonth() - nac.getMonth();
-  if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
-  return edad;
 }
