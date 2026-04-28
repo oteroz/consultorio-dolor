@@ -1,5 +1,5 @@
-import { api } from '../../../lib/api.js';
+import { listPatients } from '../../pacientes/services/pacientesService.js';
 
 export function listPatientsForSelect() {
-  return api.get('/patients').then(d => d.patients);
+  return listPatients();
 }

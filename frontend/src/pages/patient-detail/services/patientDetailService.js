@@ -1,11 +1,12 @@
 import { api } from '../../../lib/api.js';
+import { deletePatient as deletePatientRecord, getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 
 export function getPatient(patientId) {
-  return api.get(`/patients/${patientId}`).then(d => d.patient);
+  return getPatientRecord(patientId);
 }
 
 export function deletePatient(patientId) {
-  return api.delete(`/patients/${patientId}`);
+  return deletePatientRecord(patientId);
 }
 
 export function getPatientConsultations(patientId) {
