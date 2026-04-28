@@ -55,7 +55,7 @@ export function useConsultaForm({ patientId, consultationId }) {
         await updateConsultation(consultationId, payload);
         return consultationId;
       }
-      payload.patient_id = Number(patientId);
+      payload.patient_id = patientId;
       const created = await createConsultation(payload);
       return created.id;
     } catch (err) {
