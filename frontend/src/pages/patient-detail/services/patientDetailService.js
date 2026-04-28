@@ -1,4 +1,5 @@
 import { api } from '../../../lib/api.js';
+import { getAppointments } from '../../agenda/services/agendaService.js';
 import { deletePatient as deletePatientRecord, getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 
 export function getPatient(patientId) {
@@ -26,12 +27,12 @@ export function getPatientMedicationTitrations(patientId) {
 }
 
 export function getAppointmentsBetween(desde, hasta) {
-  return api.get(`/appointments?desde=${desde}&hasta=${hasta}`).then(d => d.appointments || []);
+  return getAppointments(desde, hasta);
 }
 
 export function getPatientAppointments(patientId, desde, hasta) {
   return getAppointmentsBetween(desde, hasta)
-    .then(appointments => appointments.filter(a => a.patient_id === Number(patientId)));
+    .then(appointments => appointments.filter(a => String(a.patient_id) === String(patientId)));
 }
 
 export function getPatientHistoria(patientId) {

@@ -34,7 +34,7 @@ export default function Agenda() {
 
   async function submit(e) {
     e.preventDefault();
-    await createAppointment({ ...form, patient_id: Number(form.patient_id) });
+    await createAppointment(form);
     setForm({ patient_id: '', tipo: 'cita', fecha: toISO(cursor), hora: '', motivo: '' });
     setShowForm(false);
     load();
@@ -149,4 +149,3 @@ export default function Agenda() {
     </div>
   );
 }
-

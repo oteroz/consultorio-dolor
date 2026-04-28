@@ -63,7 +63,7 @@ export default function HistoriaTab({ patientId }) {
           list.push({ type: 'titulacion', sortKey: sortKeyFrom(t.fecha, '12:00:00'), title: `Titulación: ${t.farmaco}`, data: t });
         }
 
-        for (const a of appts.filter(x => x.patient_id === Number(patientId))) {
+        for (const a of appts.filter(x => String(x.patient_id) === String(patientId))) {
           list.push({
             type: 'cita',
             sortKey: `${a.fecha}T${a.hora || '00:00'}:00`,
