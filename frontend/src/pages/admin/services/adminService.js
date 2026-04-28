@@ -1,11 +1,12 @@
 import { api } from '../../../lib/api.js';
+import { getClinicSettings, updateClinicSettings } from '../../../services/clinicSettingsService.js';
 
 export function getSettings() {
-  return api.get('/admin/settings').then(d => d.settings);
+  return getClinicSettings();
 }
 
 export function updateSettings(settings) {
-  return api.put('/admin/settings', settings);
+  return updateClinicSettings(settings);
 }
 
 export function getUsers() {
@@ -23,4 +24,3 @@ export function updateUserActive(userId, active) {
 export function changePassword(payload) {
   return api.post('/admin/change-password', payload);
 }
-

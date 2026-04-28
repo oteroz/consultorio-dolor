@@ -1,7 +1,8 @@
 import { api } from '../../../lib/api.js';
+import { getClinicSettings } from '../../../services/clinicSettingsService.js';
 
 export function getSettings() {
-  return api.get('/admin/settings').then(d => d.settings);
+  return getClinicSettings();
 }
 
 export function getPatient(id) {
