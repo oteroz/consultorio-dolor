@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import { loginUser, logoutUser, subscribeToAuthState } from './authService.js';
 
 const AuthContext = createContext(null);
 
@@ -9,20 +9,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/auth/me')
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    const unsubscribe = subscribeToAuthState(
+      (nextUser) => {
+        setUser(nextUser);
+        setLoading(false);
+      },
+      () => {
+        setUser(null);
+        setLoading(false);
+      },
+    );
+
+    return unsubscribe;
   }, []);
 
   async function login(username, password) {
-    const data = await api.post('/auth/login', { username, password });
-    setUser(data.user);
-    return data.user;
+    const nextUser = await loginUser(username, password);
+    setUser(nextUser);
+    return nextUser;
   }
 
   async function logout() {
-    await api.post('/auth/logout', {});
+    await logoutUser();
     setUser(null);
   }
 

@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -20,7 +21,15 @@ export const isFirebaseConfigured = Boolean(
 );
 
 export const firebaseApp = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
+export const auth = firebaseApp ? getAuth(firebaseApp) : null;
 export const db = firebaseApp ? getFirestore(firebaseApp) : null;
+
+export function requireFirebaseAuth() {
+  if (!auth) {
+    throw new Error('Firebase Auth no esta configurado. Revisa las variables VITE_FIREBASE_* en .env.');
+  }
+  return auth;
+}
 
 export function requireFirestore() {
   if (!db) {

@@ -21,7 +21,7 @@ export default function AppLayout() {
     navigate('/login', { replace: true });
   }
 
-  const initials = user.fullName.split(' ').map(s => s[0]).slice(0, 2).join('').toUpperCase();
+  const initials = (user.fullName || user.email || user.username || 'U').split(' ').map(s => s[0]).slice(0, 2).join('').toUpperCase();
 
   return (
     <div className="min-h-screen flex bg-slate-50">
@@ -62,7 +62,7 @@ export default function AppLayout() {
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm text-slate-100 font-medium truncate">{user.fullName}</div>
+              <div className="text-sm text-slate-100 font-medium truncate">{user.fullName || user.email || user.username}</div>
               <div className="text-xs text-slate-400 capitalize">{user.role}</div>
             </div>
           </div>
