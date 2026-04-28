@@ -3,6 +3,11 @@ import { getClinicSettings } from '../../../services/clinicSettingsService.js';
 import { getConsultation as getConsultationRecord, getPatientConsultations as getConsultationsForPatient } from '../../consultas/services/consultasService.js';
 import { getPatientHistoria as getHistoriaForPatient } from '../../historia-clinica-form/services/clinicalHistoryFormService.js';
 import { getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
+import {
+  getMedicationsByIds as getMedicationsByIdsRecord,
+  getPatientMedications as getPatientMedicationsRecord,
+  getPatientProcedures as getPatientProceduresRecord,
+} from '../../patient-detail/services/patientDetailService.js';
 
 export function getSettings() {
   return getClinicSettings();
@@ -29,7 +34,7 @@ export function getHistoria(patientId) {
 }
 
 export function getMedicationsByIds(ids) {
-  return api.get(`/medications/by-ids/${ids}`).then(d => d.medications);
+  return getMedicationsByIdsRecord(ids);
 }
 
 export function getPatientConsultations(patientId) {
@@ -37,11 +42,11 @@ export function getPatientConsultations(patientId) {
 }
 
 export function getPatientProcedures(patientId) {
-  return api.get(`/procedures/patient/${patientId}`).then(d => d.procedures);
+  return getPatientProceduresRecord(patientId);
 }
 
 export function getPatientMedications(patientId) {
-  return api.get(`/medications/patient/${patientId}`).then(d => d.medications);
+  return getPatientMedicationsRecord(patientId);
 }
 
 export function getPaymentById(id) {

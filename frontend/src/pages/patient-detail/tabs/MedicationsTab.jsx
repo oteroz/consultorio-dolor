@@ -28,7 +28,7 @@ export default function MedicacionTab({ patientId, canWrite }) {
 
   async function submit(e) {
     e.preventDefault();
-    await createMedication({ ...form, patient_id: Number(patientId) });
+    await createMedication({ ...form, patient_id: patientId });
     setForm(emptyMed());
     setShowForm(false);
     load();

@@ -5,6 +5,7 @@ export const FIRESTORE_COLLECTIONS = {
   consultations: 'consultations',
   procedures: 'procedures',
   medications: 'medications',
+  medicationTitrations: 'medication_titrations',
   appointments: 'appointments',
   historias: 'historias_clinicas',
   budgets: 'budgets',

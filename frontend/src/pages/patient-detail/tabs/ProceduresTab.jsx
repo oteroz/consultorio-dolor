@@ -37,7 +37,7 @@ export default function ProcedimientosTab({ patientId, canWrite }) {
 
   async function submit(e) {
     e.preventDefault();
-    const payload = { ...form, patient_id: Number(patientId) };
+    const payload = { ...form, patient_id: patientId };
     payload.followup_days = payload.followup_days ? Number(payload.followup_days) : null;
     payload.eva_pre = payload.eva_pre !== '' ? Number(payload.eva_pre) : null;
     for (const key of [
