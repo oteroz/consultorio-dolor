@@ -34,7 +34,7 @@ export default function BudgetForm() {
       const items = lineItems.clean();
       if (!items.length) throw new Error('Agrega al menos un item con descripción');
       const d = await createBudget({
-        patient_id: Number(patientId),
+        patient_id: patientId,
         fecha,
         impuesto: Number(impuesto) || 0,
         notas: notas || null,

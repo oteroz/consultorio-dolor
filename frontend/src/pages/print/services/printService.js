@@ -1,7 +1,8 @@
-import { api } from '../../../lib/api.js';
 import { getClinicSettings } from '../../../services/clinicSettingsService.js';
 import { getConsultation as getConsultationRecord, getPatientConsultations as getConsultationsForPatient } from '../../consultas/services/consultasService.js';
+import { getBudget as getBudgetRecord } from '../../finanzas/services/budgetsService.js';
 import { getPatientHistoria as getHistoriaForPatient } from '../../historia-clinica-form/services/clinicalHistoryFormService.js';
+import { getInvoice as getInvoiceRecord, listInvoices, listPayments } from '../../finanzas/services/invoicesService.js';
 import { getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 import {
   getMedicationsByIds as getMedicationsByIdsRecord,
@@ -22,11 +23,11 @@ export function getConsultation(id) {
 }
 
 export function getInvoice(id) {
-  return api.get(`/invoices/${id}`).then(d => d.invoice);
+  return getInvoiceRecord(id);
 }
 
 export function getBudget(id) {
-  return api.get(`/budgets/${id}`).then(d => d.budget);
+  return getBudgetRecord(id);
 }
 
 export function getHistoria(patientId) {
@@ -50,9 +51,9 @@ export function getPatientMedications(patientId) {
 }
 
 export function getPaymentById(id) {
-  return api.get('/finances/payments?').then(d => d.payments.find(p => p.id === Number(id)));
+  return listPayments().then(rows => rows.find(p => String(p.id) === String(id)) || null);
 }
 
 export function getInvoicesIndex() {
-  return api.get('/invoices').then(d => d.invoices);
+  return listInvoices();
 }

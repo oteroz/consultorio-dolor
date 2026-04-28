@@ -3,6 +3,7 @@ import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 import { getAppointments } from '../../agenda/services/agendaService.js';
 import { getPatientConsultations as getConsultationsForPatient } from '../../consultas/services/consultasService.js';
+import { getPatientFinances as getFinancesForPatient } from '../../finanzas/services/financesService.js';
 import { getPatientHistoria as getHistoriaForPatient } from '../../historia-clinica-form/services/clinicalHistoryFormService.js';
 import { deletePatient as deletePatientRecord, getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 
@@ -50,7 +51,7 @@ export function getPatientHistoria(patientId) {
 }
 
 export function getPatientFinances(patientId) {
-  return api.get(`/finances/patient/${patientId}`);
+  return getFinancesForPatient(patientId);
 }
 
 export function createProcedure(payload) {

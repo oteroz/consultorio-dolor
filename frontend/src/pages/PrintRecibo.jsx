@@ -23,7 +23,7 @@ async function findPaymentAndInvoice(paymentId) {
   const invs = await getInvoicesIndex();
   for (const inv of invs) {
     const det = await getInvoice(inv.id);
-    const p = det.payments.find(p => p.id === Number(paymentId));
+    const p = det.payments.find(p => String(p.id) === String(paymentId));
     if (p) return { payment: p, invoice: det };
   }
   return { payment: null, invoice: null };
