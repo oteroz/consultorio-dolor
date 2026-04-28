@@ -1,21 +1,25 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
-import { api } from '../../../lib/api.js';
 import { EvaBadge } from '../shared/Badges.jsx';
 import { InfoCard, Row } from '../shared/InfoCard.jsx';
+import {
+  getPatientConsultations,
+  getPatientHistoria,
+  getPatientMedications,
+} from '../services/patientDetailService.js';
 
 export default function InfoTab({ patient, patientId }) {
   const [extra, setExtra] = useState({ historia: null, medications: [], consultations: [] });
 
   useEffect(() => {
     Promise.all([
-      api.get(`/historias/patient/${patientId}`).catch(() => ({ historia: null })),
-      api.get(`/medications/patient/${patientId}`).catch(() => ({ medications: [] })),
-      api.get(`/consultations/patient/${patientId}`).catch(() => ({ consultations: [] })),
-    ]).then(([h, m, c]) => setExtra({
-      historia: h.historia,
-      medications: m.medications || [],
-      consultations: c.consultations || [],
+      getPatientHistoria(patientId).catch(() => null),
+      getPatientMedications(patientId).catch(() => []),
+      getPatientConsultations(patientId).catch(() => []),
+    ]).then(([historia, medications, consultations]) => setExtra({
+      historia,
+      medications,
+      consultations,
     }));
   }, [patientId]);
 
@@ -170,4 +174,3 @@ export default function InfoTab({ patient, patientId }) {
     </div>
   );
 }
-

@@ -2,9 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, AlertCircle, Calendar as CalIcon, Clock, FileText, Pill, Printer, TrendingDown } from 'lucide-react';
 import EvaChart from '../../../components/EvaChart.jsx';
-import { api } from '../../../lib/api.js';
 import { EvaBadge, StatusBadge } from '../shared/Badges.jsx';
 import EmptyState from '../shared/EmptyState.jsx';
+import {
+  getAppointmentsBetween,
+  getPatientConsultations,
+  getPatientMedicationTitrations,
+  getPatientMedications,
+  getPatientProcedures,
+} from '../services/patientDetailService.js';
 import { MESES_LARGOS, sortKeyFrom } from '../utils/date.js';
 import { formatPreVitals } from '../utils/forms.js';
 
@@ -24,27 +30,27 @@ export default function HistoriaTab({ patientId }) {
         const hastaISO = hasta.toISOString().slice(0, 10);
 
         const [consults, procs, meds, titrs, appts] = await Promise.all([
-          api.get(`/consultations/patient/${patientId}`),
-          api.get(`/procedures/patient/${patientId}`),
-          api.get(`/medications/patient/${patientId}`),
-          api.get(`/medications/patient/${patientId}/titrations`),
-          api.get(`/appointments?desde=${desdeISO}&hasta=${hastaISO}`),
+          getPatientConsultations(patientId),
+          getPatientProcedures(patientId),
+          getPatientMedications(patientId),
+          getPatientMedicationTitrations(patientId),
+          getAppointmentsBetween(desdeISO, hastaISO),
         ]);
 
-        setConsultations(consults.consultations);
-        setProcedures(procs.procedures);
+        setConsultations(consults);
+        setProcedures(procs);
 
         const list = [];
 
-        for (const c of consults.consultations) {
+        for (const c of consults) {
           list.push({ type: 'consulta', sortKey: sortKeyFrom(c.date), title: c.motivo_consulta || 'Consulta', data: c });
         }
 
-        for (const p of procs.procedures) {
+        for (const p of procs) {
           list.push({ type: 'procedimiento', sortKey: sortKeyFrom(p.fecha), title: p.subtipo || p.tipo, tipo: p.tipo, data: p });
         }
 
-        for (const m of meds.medications) {
+        for (const m of meds) {
           list.push({ type: 'medicacion-inicio', sortKey: sortKeyFrom(m.fecha_inicio), title: `Prescripcion: ${m.farmaco}`, data: m });
           if (!m.activo && m.fecha_fin) {
             list.push({ type: 'medicacion-fin', sortKey: sortKeyFrom(m.fecha_fin, '23:59:00'), title: `Prescripcion suspendida: ${m.farmaco}`, data: m });
@@ -52,12 +58,12 @@ export default function HistoriaTab({ patientId }) {
         }
 
         // Titulaciones: ocultar el "Inicio" automático (ya contado como medicacion-inicio)
-        for (const t of titrs.titrations) {
+        for (const t of titrs) {
           if (t.motivo_cambio === 'Inicio') continue;
           list.push({ type: 'titulacion', sortKey: sortKeyFrom(t.fecha, '12:00:00'), title: `Titulación: ${t.farmaco}`, data: t });
         }
 
-        for (const a of (appts.appointments || []).filter(x => x.patient_id === Number(patientId))) {
+        for (const a of appts.filter(x => x.patient_id === Number(patientId))) {
           list.push({
             type: 'cita',
             sortKey: `${a.fecha}T${a.hora || '00:00'}:00`,
@@ -260,4 +266,3 @@ function TimelineBody({ event }) {
       return null;
   }
 }
-

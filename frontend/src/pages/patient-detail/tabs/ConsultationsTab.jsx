@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Plus, Printer } from 'lucide-react';
-import { api } from '../../../lib/api.js';
 import { EvaBadge } from '../shared/Badges.jsx';
 import EmptyState from '../shared/EmptyState.jsx';
+import { getPatientConsultations } from '../services/patientDetailService.js';
 
 export default function ConsultasTab({ patientId, canWrite }) {
   const [items, setItems] = useState([]);
   useEffect(() => {
-    api.get(`/consultations/patient/${patientId}`).then(d => setItems(d.consultations));
+    getPatientConsultations(patientId).then(setItems);
   }, [patientId]);
 
   return (
@@ -45,4 +45,3 @@ export default function ConsultasTab({ patientId, canWrite }) {
     </div>
   );
 }
-

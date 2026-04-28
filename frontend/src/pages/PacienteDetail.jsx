@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
-import { api } from '../lib/api.js';
 import PatientHeader from './patient-detail/PatientHeader.jsx';
 import PatientTabs from './patient-detail/PatientTabs.jsx';
+import { deletePatient, getPatient } from './patient-detail/services/patientDetailService.js';
 import TimelineTab from './patient-detail/tabs/TimelineTab.jsx';
 import ClinicalHistoryTab from './patient-detail/tabs/ClinicalHistoryTab.jsx';
 import InfoTab from './patient-detail/tabs/InfoTab.jsx';
@@ -21,12 +21,12 @@ export default function PacienteDetail() {
   const [tab, setTab] = useState('historia');
 
   useEffect(() => {
-    api.get(`/patients/${id}`).then(d => setPatient(d.patient));
+    getPatient(id).then(setPatient);
   }, [id]);
 
   async function eliminar() {
     if (!confirm('¿Eliminar este paciente y toda su información?')) return;
-    await api.delete(`/patients/${id}`);
+    await deletePatient(id);
     navigate('/pacientes');
   }
 

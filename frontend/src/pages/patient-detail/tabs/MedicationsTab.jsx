@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertCircle, Pill, Plus, Printer } from 'lucide-react';
-import { api } from '../../../lib/api.js';
 import EmptyState from '../shared/EmptyState.jsx';
 import { Field, inputCls } from '../shared/FormField.jsx';
+import {
+  createMedication,
+  createMedicationTitration,
+  getPatientMedications,
+  updateMedicationActive,
+} from '../services/patientDetailService.js';
 import { emptyMed } from '../utils/forms.js';
 
 export default function MedicacionTab({ patientId, canWrite }) {
@@ -15,15 +20,15 @@ export default function MedicacionTab({ patientId, canWrite }) {
   const [selectedIds, setSelectedIds] = useState([]);
 
   async function load() {
-    const d = await api.get(`/medications/patient/${patientId}`);
-    setMeds(d.medications);
-    setSelectedIds(current => current.filter(id => d.medications.some(m => m.id === id)));
+    const medications = await getPatientMedications(patientId);
+    setMeds(medications);
+    setSelectedIds(current => current.filter(id => medications.some(m => m.id === id)));
   }
   useEffect(() => { load(); }, [patientId]);
 
   async function submit(e) {
     e.preventDefault();
-    await api.post('/medications', { ...form, patient_id: Number(patientId) });
+    await createMedication({ ...form, patient_id: Number(patientId) });
     setForm(emptyMed());
     setShowForm(false);
     load();
@@ -31,14 +36,14 @@ export default function MedicacionTab({ patientId, canWrite }) {
 
   async function addTitration(e) {
     e.preventDefault();
-    await api.post(`/medications/${addTitrTo}/titrations`, titrForm);
+    await createMedicationTitration(addTitrTo, titrForm);
     setAddTitrTo(null);
     setTitrForm({ dosis: '', frecuencia: '', via: '', motivo_cambio: '' });
     load();
   }
 
   async function toggleActive(med) {
-    await api.put(`/medications/${med.id}`, { activo: !med.activo });
+    await updateMedicationActive(med.id, !med.activo);
     load();
   }
 
@@ -162,4 +167,3 @@ export default function MedicacionTab({ patientId, canWrite }) {
     </div>
   );
 }
-

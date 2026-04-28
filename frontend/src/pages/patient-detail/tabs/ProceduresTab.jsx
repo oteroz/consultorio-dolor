@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Activity, AlertCircle, Plus } from 'lucide-react';
-import { api } from '../../../lib/api.js';
 import EmptyState from '../shared/EmptyState.jsx';
 import { Field, inputCls } from '../shared/FormField.jsx';
+import {
+  createProcedure,
+  getPatientConsultations,
+  getPatientProcedures,
+  updateProcedureEvaPost,
+} from '../services/patientDetailService.js';
 import { emptyProcedure, formatPreVitals } from '../utils/forms.js';
 
 export default function ProcedimientosTab({ patientId, canWrite }) {
@@ -14,13 +19,13 @@ export default function ProcedimientosTab({ patientId, canWrite }) {
   const [evaPostValue, setEvaPostValue] = useState('');
 
   async function load() {
-    const d = await api.get(`/procedures/patient/${patientId}`);
-    setItems(d.procedures);
+    const procedures = await getPatientProcedures(patientId);
+    setItems(procedures);
   }
   useEffect(() => {
     load();
-    api.get(`/consultations/patient/${patientId}`).then(d => {
-      const withEva = d.consultations.filter(c => c.eva != null);
+    getPatientConsultations(patientId).then(consultations => {
+      const withEva = consultations.filter(c => c.eva != null);
       setLatestEva(withEva.length ? withEva[0].eva : null);
     });
   }, [patientId]);
@@ -45,7 +50,7 @@ export default function ProcedimientosTab({ patientId, canWrite }) {
     ]) {
       payload[key] = payload[key] || null;
     }
-    await api.post('/procedures', payload);
+    await createProcedure(payload);
     setShowForm(false);
     setForm(emptyProcedure());
     load();
@@ -54,7 +59,7 @@ export default function ProcedimientosTab({ patientId, canWrite }) {
   async function saveEvaPost(e, procId) {
     e.preventDefault();
     if (evaPostValue === '') return;
-    await api.patch(`/procedures/${procId}`, { eva_post: Number(evaPostValue) });
+    await updateProcedureEvaPost(procId, Number(evaPostValue));
     setEvaPostFor(null);
     setEvaPostValue('');
     load();
@@ -192,4 +197,3 @@ export default function ProcedimientosTab({ patientId, canWrite }) {
     </div>
   );
 }
-

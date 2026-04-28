@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ClipboardList, Pencil, Plus, Printer } from 'lucide-react';
-import { api } from '../../../lib/api.js';
+import { getPatientHistoria } from '../services/patientDetailService.js';
 
 export default function HistoriaClinicaTab({ patientId, canWrite }) {
   const [historia, setHistoria] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/historias/patient/${patientId}`)
-      .then(d => setHistoria(d.historia))
+    getPatientHistoria(patientId)
+      .then(setHistoria)
       .finally(() => setLoading(false));
   }, [patientId]);
 
@@ -236,4 +236,3 @@ function hasHistoriaClinicaData(historia, tono, reflejos) {
   const hasReflejos = Object.values(reflejos).some(v => v?.d !== '' || v?.i !== '');
   return hasText || hasTono || hasReflejos;
 }
-

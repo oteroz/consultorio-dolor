@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Calendar as CalIcon } from 'lucide-react';
-import { api } from '../../../lib/api.js';
 import { StatusBadge } from '../shared/Badges.jsx';
 import EmptyState from '../shared/EmptyState.jsx';
+import { getPatientAppointments } from '../services/patientDetailService.js';
 
 export default function AgendaTab({ patient }) {
   const [appts, setAppts] = useState([]);
   useEffect(() => {
     const desde = new Date(); desde.setMonth(desde.getMonth() - 6);
     const hasta = new Date(); hasta.setMonth(hasta.getMonth() + 3);
-    api.get(`/appointments?desde=${desde.toISOString().slice(0,10)}&hasta=${hasta.toISOString().slice(0,10)}`)
-      .then(d => setAppts(d.appointments.filter(a => a.patient_id === patient.id)));
+    getPatientAppointments(patient.id, desde.toISOString().slice(0,10), hasta.toISOString().slice(0,10))
+      .then(setAppts);
   }, [patient.id]);
 
   return (
@@ -36,4 +36,3 @@ export default function AgendaTab({ patient }) {
     </div>
   );
 }
-

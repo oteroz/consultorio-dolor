@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { api } from '../../../lib/api.js';
 import { BudgetEstadoBadge, InvoiceEstadoBadge } from '../shared/Badges.jsx';
+import { getPatientFinances } from '../services/patientDetailService.js';
 
 export default function CuentaTab({ patientId }) {
   const [data, setData] = useState(null);
   useEffect(() => {
-    api.get(`/finances/patient/${patientId}`).then(setData);
+    getPatientFinances(patientId).then(setData);
   }, [patientId]);
 
   const fmt = n => 'RD$ ' + Number(n || 0).toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -120,4 +120,3 @@ export default function CuentaTab({ patientId }) {
     </div>
   );
 }
-
