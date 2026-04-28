@@ -1,6 +1,7 @@
 import { api } from '../../../lib/api.js';
 import { getAppointments } from '../../agenda/services/agendaService.js';
 import { getPatientConsultations as getConsultationsForPatient } from '../../consultas/services/consultasService.js';
+import { getPatientHistoria as getHistoriaForPatient } from '../../historia-clinica-form/services/clinicalHistoryFormService.js';
 import { deletePatient as deletePatientRecord, getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 
 export function getPatient(patientId) {
@@ -37,7 +38,7 @@ export function getPatientAppointments(patientId, desde, hasta) {
 }
 
 export function getPatientHistoria(patientId) {
-  return api.get(`/historias/patient/${patientId}`).then(d => d.historia);
+  return getHistoriaForPatient(patientId);
 }
 
 export function getPatientFinances(patientId) {

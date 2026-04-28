@@ -1,6 +1,7 @@
 import { api } from '../../../lib/api.js';
 import { getClinicSettings } from '../../../services/clinicSettingsService.js';
 import { getConsultation as getConsultationRecord, getPatientConsultations as getConsultationsForPatient } from '../../consultas/services/consultasService.js';
+import { getPatientHistoria as getHistoriaForPatient } from '../../historia-clinica-form/services/clinicalHistoryFormService.js';
 import { getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 
 export function getSettings() {
@@ -24,7 +25,7 @@ export function getBudget(id) {
 }
 
 export function getHistoria(patientId) {
-  return api.get(`/historias/patient/${patientId}`).then(d => d.historia);
+  return getHistoriaForPatient(patientId);
 }
 
 export function getMedicationsByIds(ids) {

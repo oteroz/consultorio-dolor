@@ -50,7 +50,7 @@ export function useHistoriaForm(patientId) {
   async function save() {
     setSaving(true); setError('');
     try {
-      const payload = { ...form, patient_id: Number(patientId) };
+      const payload = { ...form, patient_id: patientId };
       payload.tono_muscular = JSON.stringify(tono);
       payload.reflejos = JSON.stringify(reflejos);
       if (!hasClinicalData(form, tono, reflejos)) {
