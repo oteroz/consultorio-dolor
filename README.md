@@ -10,7 +10,7 @@ La aplicacion actual funciona localmente con:
 - Backend local: Node, Express y SQLite.
 - Autenticacion local: sesiones de Express y `bcryptjs`.
 
-El objetivo del refactor es llevar el proyecto a una arquitectura publicable en GitHub Pages, con React hablando directamente con Firebase como base de datos externa. No se usara Firebase Auth por ahora; los usuarios se manejaran con el sistema propio.
+El objetivo del refactor es llevar el proyecto a una arquitectura publicable en GitHub Pages, con React hablando directamente con Firebase como base de datos externa y autenticacion con Firebase Auth.
 
 ## Desarrollo Local
 
@@ -39,3 +39,18 @@ Principios para el trabajo:
 ## Variables de Entorno
 
 Usar `.env.example` como plantilla. Los archivos `.env` reales no se versionan.
+
+## Deploy a GitHub Pages
+
+El workflow vive en `.github/workflows/deploy-pages.yml` y se ejecuta en cada push a `main`.
+
+Requisitos:
+
+- Activar GitHub Pages en el repositorio usando **GitHub Actions** como source.
+- Definir variables `VITE_...` en tiempo de build si no van versionadas.
+
+Build local de Pages (opcional):
+
+```bash
+npm run build:pages -w frontend
+```
