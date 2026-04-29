@@ -1,5 +1,3 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 import { getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 
@@ -8,28 +6,15 @@ export function getPatient(patientId) {
 }
 
 export function getPatientHistoria(patientId) {
-  if (isFirebaseDataSource()) return getFirestorePatientHistoria(patientId);
-
-  return api.get(`/historias/patient/${patientId}`).then(d => d.historia);
+  return getFirestorePatientHistoria(patientId);
 }
 
 export function createHistoria(payload) {
-  if (isFirebaseDataSource()) return createFirestoreHistoria(payload);
-
-  return api.post('/historias', toApiPayload(payload));
+  return createFirestoreHistoria(payload);
 }
 
 export function updateHistoria(historiaId, payload) {
-  if (isFirebaseDataSource()) return updateFirestoreHistoria(historiaId, payload);
-
-  return api.put(`/historias/${historiaId}`, toApiPayload(payload));
-}
-
-function toApiPayload(payload) {
-  return {
-    ...payload,
-    patient_id: payload.patient_id === undefined ? undefined : Number(payload.patient_id),
-  };
+  return updateFirestoreHistoria(historiaId, payload);
 }
 
 function toFirestorePayload(payload) {

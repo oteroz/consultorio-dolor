@@ -41,14 +41,16 @@ export default function Login() {
 
         <form onSubmit={onSubmit} className="bg-white rounded-2xl shadow-card border border-slate-200 p-6">
           <label className="block mb-4">
-            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Usuario</span>
+            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Correo
+            </span>
             <input
-              type="text"
+              type="email"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               autoFocus
-              autoComplete="username"
+              autoComplete="email"
             />
           </label>
 

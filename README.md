@@ -4,26 +4,23 @@ Aplicacion web para gestion de un consultorio de terapia del dolor.
 
 ## Estado
 
-La aplicacion actual funciona localmente con:
+La aplicacion funciona como frontend puro con Firebase:
 
 - Frontend: React, Vite y Tailwind CSS.
-- Backend local: Node, Express y SQLite.
-- Autenticacion local: sesiones de Express y `bcryptjs`.
+- Base de datos externa: Firestore.
+- Autenticacion: Firebase Auth.
 
-El objetivo del refactor es llevar el proyecto a una arquitectura publicable en GitHub Pages, con React hablando directamente con Firebase como base de datos externa y autenticacion con Firebase Auth.
+El objetivo es publicar en GitHub Pages con React hablando directamente con Firebase.
 
 ## Desarrollo Local
 
 ```bash
 npm install
-npm run migrate
-npm run seed
 npm run dev
 ```
 
-Servicios locales actuales:
+Servicio local:
 
-- Backend: `http://localhost:3000`
 - Frontend: `http://localhost:5173`
 
 ## Refactor
@@ -32,9 +29,8 @@ Principios para el trabajo:
 
 - Un archivo, una responsabilidad.
 - Separar paginas, componentes, hooks, servicios de datos y utilidades.
-- Evitar llamadas directas a `/api` dentro de componentes nuevos.
-- Mantener el backend local solo mientras sirva durante la migracion.
-- No versionar bases SQLite, builds, `node_modules` ni runtime portable.
+- Usar servicios de Firestore por feature.
+- No versionar builds, `node_modules` ni archivos de entorno reales.
 
 ## Variables de Entorno
 
@@ -52,5 +48,5 @@ Requisitos:
 Build local de Pages (opcional):
 
 ```bash
-npm run build:pages -w frontend
+npm run build:pages
 ```

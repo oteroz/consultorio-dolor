@@ -1,30 +1,38 @@
 import { useEffect, useState } from 'react';
-import { AlertCircle, Plus } from 'lucide-react';
-import { Field, inputCls, PermissionDenied } from '../components/AdminShared.jsx';
-import { createUser, getUsers, updateUserActive } from '../services/adminService.js';
+import { AlertCircle, Info } from 'lucide-react';
+import { PermissionDenied } from '../components/AdminShared.jsx';
+import { getUsers, updateUserActive } from '../services/adminService.js';
 
 export default function UsuariosTab({ isAdmin }) {
   const [users, setUsers] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ username: '', password: '', full_name: '', role: 'medico' });
   const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  async function load() { const users = await getUsers(); setUsers(users); }
-  useEffect(() => { if (isAdmin) load(); }, [isAdmin]);
-
-  async function submit(e) {
-    e.preventDefault(); setErr('');
+  async function load() {
+    setLoading(true);
+    setErr('');
     try {
-      await createUser(form);
-      setForm({ username: '', password: '', full_name: '', role: 'medico' });
-      setShowForm(false);
-      load();
-    } catch (e) { setErr(e.message); }
+      const users = await getUsers();
+      setUsers(users);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
+  useEffect(() => {
+    if (isAdmin) load();
+  }, [isAdmin]);
+
   async function toggle(u) {
-    await updateUserActive(u.id, !u.active);
-    load();
+    setErr('');
+    try {
+      await updateUserActive(u.id, !u.active);
+      load();
+    } catch (e) {
+      setErr(e.message);
+    }
   }
 
   if (!isAdmin) return <PermissionDenied />;
@@ -39,30 +47,20 @@ export default function UsuariosTab({ isAdmin }) {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Usuarios del sistema</h3>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium"
-        >
-          <Plus size={16} /> Nuevo usuario
-        </button>
       </div>
 
-      {showForm && (
-        <form onSubmit={submit} className="bg-white rounded-xl border border-slate-200 p-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-3 shadow-card animate-fade-in">
-          <Field label="Username *"><input required className={inputCls} value={form.username} onChange={e=>setForm({...form, username:e.target.value})} /></Field>
-          <Field label="Nombre completo *"><input required className={inputCls} value={form.full_name} onChange={e=>setForm({...form, full_name:e.target.value})} /></Field>
-          <Field label="Contraseña *"><input required type="password" className={inputCls} value={form.password} onChange={e=>setForm({...form, password:e.target.value})} /></Field>
-          <Field label="Rol *"><select className={inputCls} value={form.role} onChange={e=>setForm({...form, role:e.target.value})}>
-            <option value="admin">Admin</option>
-            <option value="medico">Médico</option>
-            <option value="secretaria">Secretaria</option>
-          </select></Field>
-          {err && <div className="md:col-span-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2"><AlertCircle size={14} />{err}</div>}
-          <div className="md:col-span-2 flex gap-2">
-            <button type="submit" className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium">Crear</button>
-            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm font-medium">Cancelar</button>
-          </div>
-        </form>
+      <div className="mb-4 p-3 bg-sky-50 border border-sky-200 rounded-xl flex items-start gap-2 text-sm text-sky-900">
+        <Info size={16} className="shrink-0 mt-0.5" />
+        <p>
+          Crea usuarios en Firebase Auth y asigna permisos agregando su correo en FIREBASE_RULES.md.
+          Esta lista muestra los perfiles que ya iniciaron sesion; aqui solo puedes activar o desactivar acceso.
+        </p>
+      </div>
+
+      {err && (
+        <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2">
+          <AlertCircle size={14} />{err}
+        </div>
       )}
 
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-card">
@@ -77,12 +75,24 @@ export default function UsuariosTab({ isAdmin }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
+            {loading && (
+              <tr>
+                <td colSpan={5} className="px-5 py-6 text-center text-sm text-slate-500">Cargando usuarios...</td>
+              </tr>
+            )}
+            {!loading && users.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-5 py-6 text-center text-sm text-slate-500">
+                  No hay perfiles registrados todavia.
+                </td>
+              </tr>
+            )}
             {users.map(u => (
               <tr key={u.id} className="hover:bg-slate-50">
-                <td className="px-5 py-3 font-medium text-slate-900">{u.username}</td>
+                <td className="px-5 py-3 font-medium text-slate-900">{u.email || u.username}</td>
                 <td className="px-5 py-3 text-slate-600">{u.full_name}</td>
                 <td className="px-5 py-3">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${roleStyles[u.role]}`}>{u.role}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${roleStyles[u.role] || 'bg-slate-100 text-slate-700'}`}>{u.role}</span>
                 </td>
                 <td className="px-5 py-3">
                   <span className={`text-xs px-2 py-0.5 rounded-full ${u.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>
@@ -102,4 +112,3 @@ export default function UsuariosTab({ isAdmin }) {
     </div>
   );
 }
-

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import AdminTabs from './admin/components/AdminTabs.jsx';
-import BackupTab from './admin/tabs/BackupTab.jsx';
 import ConsultorioTab from './admin/tabs/ConsultorioTab.jsx';
 import PasswordTab from './admin/tabs/PasswordTab.jsx';
 import UsuariosTab from './admin/tabs/UsuariosTab.jsx';
@@ -20,7 +19,6 @@ export default function Admin() {
         {tab === 'consultorio' && <ConsultorioTab isAdmin={isAdmin} />}
         {tab === 'usuarios' && <UsuariosTab isAdmin={isAdmin} />}
         {tab === 'password' && <PasswordTab />}
-        {tab === 'backup' && <BackupTab isAdmin={isAdmin} />}
       </div>
     </div>
   );

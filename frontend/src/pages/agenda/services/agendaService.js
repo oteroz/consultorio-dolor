@@ -1,14 +1,5 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 import { listPatients } from '../../pacientes/services/pacientesService.js';
-
-function toApiAppointmentPayload(payload) {
-  return {
-    ...payload,
-    patient_id: Number(payload.patient_id),
-  };
-}
 
 function toFirestoreAppointmentPayload(payload) {
   return {
@@ -64,15 +55,11 @@ function sortAppointments(a, b) {
 }
 
 export function getAppointments(desde, hasta) {
-  if (isFirebaseDataSource()) return getFirestoreAppointments(desde, hasta);
-
-  return api.get(`/appointments?desde=${desde}&hasta=${hasta}`).then(d => d.appointments);
+  return getFirestoreAppointments(desde, hasta);
 }
 
 export function getPendingFollowups() {
-  if (isFirebaseDataSource()) return getFirestorePendingFollowups();
-
-  return api.get('/appointments/followups-pendientes').then(d => d.followups);
+  return getFirestorePendingFollowups();
 }
 
 export function getPatients() {
@@ -80,15 +67,11 @@ export function getPatients() {
 }
 
 export function createAppointment(payload) {
-  if (isFirebaseDataSource()) return createFirestoreAppointment(payload);
-
-  return api.post('/appointments', toApiAppointmentPayload(payload));
+  return createFirestoreAppointment(payload);
 }
 
 export function updateAppointmentStatus(id, estado) {
-  if (isFirebaseDataSource()) return updateFirestoreAppointmentStatus(id, estado);
-
-  return api.put(`/appointments/${id}`, { estado });
+  return updateFirestoreAppointmentStatus(id, estado);
 }
 
 async function getAllFirestoreAppointments() {

@@ -1,13 +1,4 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
-
-function toApiPayload(payload) {
-  return {
-    ...payload,
-    patient_id: payload.patient_id === undefined ? undefined : Number(payload.patient_id),
-  };
-}
 
 function toFirestorePayload(payload) {
   const data = {};
@@ -46,33 +37,23 @@ async function firestoreApi() {
 }
 
 export function getConsultation(id) {
-  if (isFirebaseDataSource()) return getFirestoreConsultation(id);
-
-  return api.get(`/consultations/${id}`).then(d => d.consultation);
+  return getFirestoreConsultation(id);
 }
 
 export function getPatientConsultations(patientId) {
-  if (isFirebaseDataSource()) return getFirestorePatientConsultations(patientId);
-
-  return api.get(`/consultations/patient/${patientId}`).then(d => d.consultations);
+  return getFirestorePatientConsultations(patientId);
 }
 
 export function createConsultation(payload) {
-  if (isFirebaseDataSource()) return createFirestoreConsultation(payload);
-
-  return api.post('/consultations', toApiPayload(payload)).then(d => d.consultation);
+  return createFirestoreConsultation(payload);
 }
 
 export function updateConsultation(id, payload) {
-  if (isFirebaseDataSource()) return updateFirestoreConsultation(id, payload);
-
-  return api.put(`/consultations/${id}`, toApiPayload(payload));
+  return updateFirestoreConsultation(id, payload);
 }
 
 export function deleteConsultation(id) {
-  if (isFirebaseDataSource()) return deleteFirestoreConsultation(id);
-
-  return api.delete(`/consultations/${id}`);
+  return deleteFirestoreConsultation(id);
 }
 
 async function getFirestoreConsultation(id) {

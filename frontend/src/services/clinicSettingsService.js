@@ -1,5 +1,3 @@
-import { api } from '../lib/api.js';
-import { isFirebaseDataSource } from '../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS, FIRESTORE_DOCS } from '../lib/firestoreCollections.js';
 
 const DEFAULT_SETTINGS = {
@@ -13,10 +11,6 @@ const DEFAULT_SETTINGS = {
 };
 
 export async function getClinicSettings() {
-  if (!isFirebaseDataSource()) {
-    return api.get('/admin/settings').then(d => d.settings);
-  }
-
   const [{ doc, getDoc }, { requireFirestore }] = await Promise.all([
     import('firebase/firestore'),
     import('../lib/firebase.js'),
@@ -31,10 +25,6 @@ export async function getClinicSettings() {
 }
 
 export async function updateClinicSettings(settings) {
-  if (!isFirebaseDataSource()) {
-    return api.put('/admin/settings', settings);
-  }
-
   const [{ doc, serverTimestamp, setDoc }, { requireFirestore }] = await Promise.all([
     import('firebase/firestore'),
     import('../lib/firebase.js'),

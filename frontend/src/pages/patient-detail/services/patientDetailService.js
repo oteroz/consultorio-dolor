@@ -1,5 +1,3 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 import { getAppointments } from '../../agenda/services/agendaService.js';
 import { getPatientConsultations as getConsultationsForPatient } from '../../consultas/services/consultasService.js';
@@ -20,21 +18,15 @@ export function getPatientConsultations(patientId) {
 }
 
 export function getPatientProcedures(patientId) {
-  if (isFirebaseDataSource()) return getFirestorePatientProcedures(patientId);
-
-  return api.get(`/procedures/patient/${patientId}`).then(d => d.procedures);
+  return getFirestorePatientProcedures(patientId);
 }
 
 export function getPatientMedications(patientId) {
-  if (isFirebaseDataSource()) return getFirestorePatientMedications(patientId);
-
-  return api.get(`/medications/patient/${patientId}`).then(d => d.medications);
+  return getFirestorePatientMedications(patientId);
 }
 
 export function getPatientMedicationTitrations(patientId) {
-  if (isFirebaseDataSource()) return getFirestorePatientMedicationTitrations(patientId);
-
-  return api.get(`/medications/patient/${patientId}/titrations`).then(d => d.titrations);
+  return getFirestorePatientMedicationTitrations(patientId);
 }
 
 export function getAppointmentsBetween(desde, hasta) {
@@ -55,38 +47,26 @@ export function getPatientFinances(patientId) {
 }
 
 export function createProcedure(payload) {
-  if (isFirebaseDataSource()) return createFirestoreProcedure(payload);
-
-  return api.post('/procedures', payload);
+  return createFirestoreProcedure(payload);
 }
 
 export function updateProcedureEvaPost(procedureId, evaPost) {
-  if (isFirebaseDataSource()) return updateFirestoreProcedure(procedureId, { eva_post: evaPost });
-
-  return api.patch(`/procedures/${procedureId}`, { eva_post: evaPost });
+  return updateFirestoreProcedure(procedureId, { eva_post: evaPost });
 }
 
 export function createMedication(payload) {
-  if (isFirebaseDataSource()) return createFirestoreMedication(payload);
-
-  return api.post('/medications', payload);
+  return createFirestoreMedication(payload);
 }
 
 export function createMedicationTitration(medicationId, payload) {
-  if (isFirebaseDataSource()) return createFirestoreMedicationTitration(medicationId, payload);
-
-  return api.post(`/medications/${medicationId}/titrations`, payload);
+  return createFirestoreMedicationTitration(medicationId, payload);
 }
 
 export function updateMedicationActive(medicationId, active) {
-  if (isFirebaseDataSource()) return updateFirestoreMedication(medicationId, { activo: active });
-
-  return api.put(`/medications/${medicationId}`, { activo: active });
+  return updateFirestoreMedication(medicationId, { activo: active });
 }
 
 export async function getMedicationsByIds(idsCsv) {
-  if (!isFirebaseDataSource()) return api.get(`/medications/by-ids/${idsCsv}`).then(d => d.medications);
-
   const ids = String(idsCsv || '').split(',').map(v => v.trim()).filter(Boolean);
   if (!ids.length) return [];
 

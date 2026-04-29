@@ -1,5 +1,3 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 import { listPatients } from '../../pacientes/services/pacientesService.js';
 
@@ -22,14 +20,7 @@ async function firestoreApi() {
 }
 
 export function listProcedures({ desde, hasta, tipo } = {}) {
-  if (isFirebaseDataSource()) return listFirestoreProcedures({ desde, hasta, tipo });
-
-  const qs = new URLSearchParams();
-  if (desde) qs.set('desde', desde);
-  if (hasta) qs.set('hasta', hasta);
-  if (tipo) qs.set('tipo', tipo);
-  const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  return api.get(`/procedures${suffix}`).then(d => d.procedures);
+  return listFirestoreProcedures({ desde, hasta, tipo });
 }
 
 async function listFirestoreProcedures({ desde, hasta, tipo } = {}) {

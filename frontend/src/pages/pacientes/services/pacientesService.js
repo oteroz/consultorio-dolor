@@ -1,5 +1,3 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 
 function cleanPayload(payload) {
@@ -45,34 +43,23 @@ async function firestoreApi() {
 }
 
 export function listPatients(query) {
-  if (isFirebaseDataSource()) return listFirestorePatients(query);
-
-  const qs = query ? `?q=${encodeURIComponent(query)}` : '';
-  return api.get(`/patients${qs}`).then(d => d.patients);
+  return listFirestorePatients(query);
 }
 
 export function getPatient(id) {
-  if (isFirebaseDataSource()) return getFirestorePatient(id);
-
-  return api.get(`/patients/${id}`).then(d => d.patient);
+  return getFirestorePatient(id);
 }
 
 export function createPatient(payload) {
-  if (isFirebaseDataSource()) return createFirestorePatient(payload);
-
-  return api.post('/patients', payload).then(d => d.patient);
+  return createFirestorePatient(payload);
 }
 
 export function updatePatient(id, payload) {
-  if (isFirebaseDataSource()) return updateFirestorePatient(id, payload);
-
-  return api.put(`/patients/${id}`, payload);
+  return updateFirestorePatient(id, payload);
 }
 
 export function deletePatient(id) {
-  if (isFirebaseDataSource()) return deleteFirestorePatient(id);
-
-  return api.delete(`/patients/${id}`);
+  return deleteFirestorePatient(id);
 }
 
 async function listFirestorePatients(query) {

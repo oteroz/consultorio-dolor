@@ -1,29 +1,19 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { listBudgets } from './budgetsService.js';
 import { listInvoices, listPayments } from './invoicesService.js';
 
 export function getSummary() {
-  if (isFirebaseDataSource()) return getFirebaseSummary();
-
-  return api.get('/finances/summary');
+  return getFirebaseSummary();
 }
 
 export function getDeudores() {
-  if (isFirebaseDataSource()) return getFirebaseDeudores();
-
-  return api.get('/finances/deudores').then(d => d.deudores);
+  return getFirebaseDeudores();
 }
 
 export function getPorMes() {
-  if (isFirebaseDataSource()) return getFirebasePorMes();
-
-  return api.get('/finances/por-mes').then(d => d.meses);
+  return getFirebasePorMes();
 }
 
 export function getPatientFinances(patientId) {
-  if (!isFirebaseDataSource()) return api.get(`/finances/patient/${patientId}`);
-
   return getFirebasePatientFinances(patientId);
 }
 

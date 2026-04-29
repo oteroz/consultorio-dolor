@@ -1,11 +1,9 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 import { getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
 
-function toApiPayload(payload) {
+function toFirestorePayload(payload) {
   const data = { ...payload };
-  if (data.patient_id !== undefined) data.patient_id = Number(data.patient_id);
+  if (data.patient_id !== undefined) data.patient_id = String(data.patient_id);
   return data;
 }
 
@@ -47,57 +45,34 @@ async function firestoreApi() {
 }
 
 export function listInvoices() {
-  if (isFirebaseDataSource()) return listFirestoreInvoices();
-
-  return api.get('/invoices').then(d => d.invoices);
+  return listFirestoreInvoices();
 }
 
 export function getInvoice(id) {
-  if (isFirebaseDataSource()) return getFirestoreInvoice(id);
-
-  return api.get(`/invoices/${id}`).then(d => d.invoice);
+  return getFirestoreInvoice(id);
 }
 
 export function createInvoice(payload) {
-  if (isFirebaseDataSource()) return createFirestoreInvoice(payload);
-
-  return api.post('/invoices', toApiPayload(payload));
+  return createFirestoreInvoice(payload);
 }
 
 export function addPayment(invoiceId, payload) {
-  if (isFirebaseDataSource()) return addFirestorePayment(invoiceId, payload);
-
-  return api.post(`/invoices/${invoiceId}/payments`, payload);
+  return addFirestorePayment(invoiceId, payload);
 }
 
 export function deletePayment(invoiceId, paymentId) {
-  if (isFirebaseDataSource()) return deleteFirestorePayment(invoiceId, paymentId);
-
-  return api.delete(`/invoices/${invoiceId}/payments/${paymentId}`);
+  return deleteFirestorePayment(invoiceId, paymentId);
 }
 
 export function voidInvoice(id) {
-  if (isFirebaseDataSource()) return voidFirestoreInvoice(id);
-
-  return api.post(`/invoices/${id}/void`, {});
+  return voidFirestoreInvoice(id);
 }
 
 export function deleteInvoice(id) {
-  if (isFirebaseDataSource()) return deleteFirestoreInvoice(id);
-
-  return api.delete(`/invoices/${id}`);
+  return deleteFirestoreInvoice(id);
 }
 
 export async function listPayments({ patientId, desde, hasta } = {}) {
-  if (!isFirebaseDataSource()) {
-    const qs = new URLSearchParams();
-    if (patientId) qs.set('patient_id', patientId);
-    if (desde) qs.set('desde', desde);
-    if (hasta) qs.set('hasta', hasta);
-    const suffix = qs.toString() ? `?${qs.toString()}` : '';
-    return api.get(`/finances/payments${suffix}`).then(d => d.payments);
-  }
-
   const { collection, getDocs, db } = await firestoreApi();
   const [payments, invoices, patients] = await Promise.all([
     getDocs(collection(db, FIRESTORE_COLLECTIONS.payments)).then(s => s.docs.map(normalizeFirestoreDoc)),
@@ -172,8 +147,7 @@ async function getFirestoreInvoice(id) {
 
 async function createFirestoreInvoice(payload) {
   const { addDoc, collection, serverTimestamp, db } = await firestoreApi();
-  const data = toApiPayload(payload);
-  data.patient_id = String(data.patient_id);
+  const data = toFirestorePayload(payload);
   const { items, subtotal } = calcItems(data.items);
   const impuesto = Number(data.impuesto || 0);
   const total = subtotal + impuesto;

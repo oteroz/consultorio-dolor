@@ -1,10 +1,9 @@
-import { Building2, Download, Key, Users } from 'lucide-react';
+import { Building2, Key, Users } from 'lucide-react';
 
 const tabs = [
   { key: 'consultorio', label: 'Consultorio', icon: Building2 },
   { key: 'usuarios', label: 'Usuarios', icon: Users },
   { key: 'password', label: 'Mi contrase?a', icon: Key },
-  { key: 'backup', label: 'Backup', icon: Download },
 ];
 
 export default function AdminTabs({ activeTab, onChange }) {
@@ -27,4 +26,3 @@ export default function AdminTabs({ activeTab, onChange }) {
     </div>
   );
 }
-

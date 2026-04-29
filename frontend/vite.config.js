@@ -1,24 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig(({ mode }) => {
-  const isPagesBuild = mode === 'pages';
-  const base = isPagesBuild ? (process.env.VITE_BASE_PATH || '/') : '/';
-
+export default defineConfig(() => {
   return {
     plugins: [react()],
-    base,
+    base: process.env.VITE_BASE_PATH || '/',
     server: {
       port: 5173,
-      proxy: {
-        '/api': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-        },
-      },
     },
     build: {
-      outDir: isPagesBuild ? 'dist' : '../backend/public',
+      outDir: 'dist',
       emptyOutDir: true,
     },
   };

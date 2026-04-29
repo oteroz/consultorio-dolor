@@ -1,13 +1,5 @@
-import { api } from '../../../lib/api.js';
-import { isFirebaseDataSource } from '../../../lib/dataSource.js';
 import { FIRESTORE_COLLECTIONS } from '../../../lib/firestoreCollections.js';
 import { getPatient as getPatientRecord } from '../../pacientes/services/pacientesService.js';
-
-function toApiPayload(payload) {
-  const data = { ...payload };
-  if (data.patient_id !== undefined) data.patient_id = Number(data.patient_id);
-  return data;
-}
 
 function toFirestorePayload(payload) {
   const data = { ...payload };
@@ -46,41 +38,26 @@ async function firestoreApi() {
 }
 
 export function getBudget(id) {
-  if (isFirebaseDataSource()) return getFirestoreBudget(id);
-
-  return api.get(`/budgets/${id}`).then(d => d.budget);
+  return getFirestoreBudget(id);
 }
 
 export function createBudget(payload) {
-  if (isFirebaseDataSource()) return createFirestoreBudget(payload);
-
-  return api.post('/budgets', toApiPayload(payload));
+  return createFirestoreBudget(payload);
 }
 
 export function updateBudget(id, payload) {
-  if (isFirebaseDataSource()) return updateFirestoreBudget(id, payload);
-
-  return api.put(`/budgets/${id}`, toApiPayload(payload));
+  return updateFirestoreBudget(id, payload);
 }
 
 export function convertBudgetToInvoice(id) {
-  if (isFirebaseDataSource()) return convertFirestoreBudgetToInvoice(id);
-
-  return api.post(`/budgets/${id}/to-invoice`, {});
+  return convertFirestoreBudgetToInvoice(id);
 }
 
 export function deleteBudget(id) {
-  if (isFirebaseDataSource()) return deleteFirestoreBudget(id);
-
-  return api.delete(`/budgets/${id}`);
+  return deleteFirestoreBudget(id);
 }
 
 export async function listBudgets(patientId) {
-  if (!isFirebaseDataSource()) {
-    const qs = patientId ? `?patient_id=${encodeURIComponent(patientId)}` : '';
-    return api.get(`/budgets${qs}`).then(d => d.budgets);
-  }
-
   const { collection, getDocs, query, where, db } = await firestoreApi();
   const ref = collection(db, FIRESTORE_COLLECTIONS.budgets);
   const snap = patientId
