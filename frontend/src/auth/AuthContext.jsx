@@ -9,18 +9,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setUser(null);
+      setLoading(false);
+    }, 8000);
+
     const unsubscribe = subscribeToAuthState(
       (nextUser) => {
+        clearTimeout(timeoutId);
         setUser(nextUser);
         setLoading(false);
       },
       () => {
+        clearTimeout(timeoutId);
         setUser(null);
         setLoading(false);
       },
     );
 
-    return unsubscribe;
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, []);
 
   async function login(username, password) {
@@ -52,7 +62,7 @@ export function RequireAuth({ children, roles }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-500">
-        Cargando…
+        Cargando...
       </div>
     );
   }
@@ -64,7 +74,7 @@ export function RequireAuth({ children, roles }) {
   if (roles && !roles.includes(user.role)) {
     return (
       <div className="p-8 text-red-600">
-        No tienes permisos para acceder a esta sección.
+        No tienes permisos para acceder a esta seccion.
       </div>
     );
   }
